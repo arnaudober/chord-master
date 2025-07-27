@@ -26,6 +26,7 @@ body,
   color: #222;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin-top: env(safe-area-inset-top);
 }
 
 @keyframes gradientBG {
