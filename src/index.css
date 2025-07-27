@@ -5,109 +5,111 @@
 @import "@fontsource/nunito/900.css";
 
 :root {
-  --font-sans: "Nunito", sans-serif;
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-blur: 18px;
-  --primary-gradient: linear-gradient(120deg, #7f53ac 0%, #647dee 100%);
-  --accent-gradient: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
-  --primary-color: #ff5252;
-  --brand-purple: #7f53ac;
+    --font-sans: "Nunito", sans-serif;
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-blur: 18px;
+    --primary-gradient: linear-gradient(120deg, #7f53ac 0%, #647dee 100%);
+    --accent-gradient: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
+    --primary-color: #ff5252;
+    --brand-purple: #7f53ac;
 }
 
 html,
 body,
 #root {
-  min-height: 100vh;
-  height: 100%;
-  font-family: var(--font-sans);
-  background: var(--primary-gradient);
-  background-size: 400% 400%;
-  animation: gradientBG 18s ease-in-out infinite;
-  color: #222;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin-top: env(safe-area-inset-top);
+    min-height: 100vh;
+    height: 100%;
+    font-family: var(--font-sans);
+    background: var(--primary-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 18s ease-in-out infinite;
+    color: #222;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-top: max(16px, env(safe-area-inset-top));
 }
 
 @keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Glassmorphism utility */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  transition: box-shadow 0.3s, background 0.3s;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    transition: box-shadow 0.3s, background 0.3s;
 }
 
 /* Typography hierarchy */
 .heading-main {
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--glass-bg) !important;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--glass-bg) !important;
 }
+
 .chord-name {
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--primary-color) !important;
-  letter-spacing: 0.01em;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-color) !important;
+    letter-spacing: 0.01em;
 }
 
 /* Smooth transitions for microinteractions */
 .smooth {
-  transition: all 0.25s cubic-bezier(0.4, 2, 0.6, 1);
+    transition: all 0.25s cubic-bezier(0.4, 2, 0.6, 1);
 }
 
-.ReactPiano__Key--active{
-  background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%) !important;
+.ReactPiano__Key--active {
+    background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%) !important;
 }
+
 .ReactPiano__Key--active.ReactPiano__Key--natural {
-  border: 1px solid var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
 }
 
 .ReactPiano__Key--natural:last-child {
-  border-top-right-radius: 1rem;
+    border-top-right-radius: 1rem;
 }
 
 /* If the first child of ReactPiano__Keyboard is an accidental (div.ReactPiano__Key--accidental), we need to add a border-top-left-radius: 1rem; to the first and second child */
 .ReactPiano__Keyboard > div.ReactPiano__Key--accidental:first-child {
-  border-top-left-radius: 1rem;
+    border-top-left-radius: 1rem;
 }
 
 .ReactPiano__Keyboard > div.ReactPiano__Key--accidental:first-child + div.ReactPiano__Key--natural {
-  border-top-left-radius: 1rem;
+    border-top-left-radius: 1rem;
 }
 
 .ReactPiano__Key--natural:first-child {
-  border-top-left-radius: 1rem;
+    border-top-left-radius: 1rem;
 }
 
 .ReactPiano__Key--natural, .ReactPiano__Key--accidental {
-  border: none !important;
+    border: none !important;
 }
 
 button {
-  transition: all 0.2s ease-in-out !important;
-  cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
 }
 
 button:hover {
-  background: var(--brand-purple) !important;
-  color: white !important;
+    background: var(--brand-purple) !important;
+    color: white !important;
 }
