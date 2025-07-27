@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: "Jazz Chord Trainer",
         short_name: "Jazz Chords",
-        start_url: "/",
+        start_url: "/jazz-chord-trainer/",
         display: "standalone",
         background_color: "#000000",
         theme_color: "#7f53ac",
