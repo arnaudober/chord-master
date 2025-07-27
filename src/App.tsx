@@ -1,0 +1,29 @@
+import { useState } from "react";
+import ChordCard from "./Card";
+import chords from "./chords.json";
+
+function App() {
+  const [index, setIndex] = useState(() =>
+    Math.floor(Math.random() * chords.length)
+  );
+
+  const nextChord = () => {
+    const next = Math.floor(Math.random() * chords.length);
+    setIndex(next);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center px-4 py-4">
+      <header className="w-full flex flex-col items-center">
+        <div className="px-4 py-3 mt-2 mb-4 w-full max-w-md rounded-2xl">
+          <h1 className="heading-main text-center">
+            Jazz Chord Trainer
+          </h1>
+        </div>
+      </header>
+      <ChordCard chord={chords[index]} onNext={nextChord} />
+    </div>
+  );
+}
+
+export default App;
