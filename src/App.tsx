@@ -13,9 +13,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-4">
+    <div className="min-h-screen flex flex-col items-center px-4 pt-2 pb-4">
       <header className="w-full flex flex-col items-center">
-        <div className="px-4 py-3 mt-2 mb-4 w-full max-w-md rounded-2xl">
+        <div className="px-4 py-2 mb-3 w-full max-w-md rounded-2xl">
           <h1 className="heading-main text-center">
             Jazz Chord Trainer
           </h1>
