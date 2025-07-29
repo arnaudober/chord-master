@@ -25,6 +25,55 @@ export default function ChordCard({ chord, onNext }: Props) {
     if (audioInitialized) return;
     
     try {
+      // Configure audio session for iOS silent mode compatibility
+      if (Tone.context.state !== 'running') {
+        await Tone.context.resume();
+      }
+      
+      // Set audio session category for iOS to allow playback in silent mode
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (typeof (window as any).webkit !== 'undefined' && (window as any).webkit.messageHandlers) {
+        // iOS WebView - try to set audio session category
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as any).webkit.messageHandlers.setAudioSessionCategory?.postMessage('playback');
+        } catch (e) {
+          console.log('Could not set audio session category:', e);
+        }
+      }
+      
+      // For Safari on iOS, we need to set the audio session category
+      if (needsAudioInit) {
+        // Try multiple methods to set audio session category for iOS
+        try {
+          // Method 1: Web Audio API (if available)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const audioContext = Tone.context.rawContext as any;
+          if (audioContext && typeof audioContext.setAudioSessionCategory === 'function') {
+            audioContext.setAudioSessionCategory('playback');
+          }
+          
+          // Method 2: Try to set via document element (for some iOS versions)
+          if (typeof document !== 'undefined') {
+            const audioElement = document.createElement('audio');
+            audioElement.setAttribute('playsinline', 'true');
+            audioElement.setAttribute('webkit-playsinline', 'true');
+            audioElement.setAttribute('preload', 'auto');
+            document.body.appendChild(audioElement);
+            
+            // Try to play and immediately pause to activate audio session
+            audioElement.play().then(() => {
+              audioElement.pause();
+              document.body.removeChild(audioElement);
+            }).catch(() => {
+              document.body.removeChild(audioElement);
+            });
+          }
+        } catch (e) {
+          console.log('Could not set audio session category:', e);
+        }
+      }
+      
       await Tone.start();
       setAudioInitialized(true);
     } catch (error) {
