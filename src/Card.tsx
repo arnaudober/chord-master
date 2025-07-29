@@ -6,7 +6,6 @@ import * as Tone from "tone";
 
 export default function ChordCard({ chord, onNext }: Props) {
   const [flipped, setFlipped] = useState(false);
-  const [animating, setAnimating] = useState(false);
   const [activeNotes, setActiveNotes] = useState<string[]>([]);
   const [samplerLoaded, setSamplerLoaded] = useState(false);
   const synthRef = useRef<Tone.Sampler | null>(null);
@@ -82,20 +81,7 @@ export default function ChordCard({ chord, onNext }: Props) {
     });
   }
 
-  const handleClick = () => {
-    setAnimating(true);
-    setTimeout(() => {
-      setAnimating(false);
-      if (!flipped) {
-        setFlipped(true);
-        playChord();
-      } else {
-        setFlipped(false);
-        setActiveNotes([]); // Clear active notes when flipping back
-        onNext();
-      }
-    }, 180);
-  };
+
 
   const sharpNotes = [
     "C",
@@ -133,32 +119,42 @@ export default function ChordCard({ chord, onNext }: Props) {
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <div
-        onClick={handleClick}
-        className={`glass w-full max-w-[420px] min-w-[220px] min-h-[100px] sm:min-h-[120px] text-center cursor-pointer transition-all duration-300 rounded-2xl flex flex-col items-center justify-center ${
-          animating ? "scale-95 opacity-80" : "scale-100 opacity-100"
-        }`}
-        role="button"
-        aria-pressed={flipped}
-        aria-label={flipped ? "Show next chord" : "Reveal chord voicing"}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") handleClick();
-        }}
+        className="glass w-full max-w-[420px] min-w-[220px] h-[280px] text-center transition-all duration-300 rounded-2xl flex flex-col items-center justify-center"
         style={{
           willChange: "transform, opacity",
         }}
       >
         {!flipped ? (
-          <h1
-            className="chord-name smooth text-4xl sm:text-5xl md:text-6xl font-extrabold"
-            style={{ letterSpacing: "0.03em" }}
-          >
-            {chord.name}
-          </h1>
+          <>
+            <div
+              className="w-full flex justify-center items-center smooth flex-1"
+              style={{ pointerEvents: "none" }}
+            >
+              <h1
+                className="chord-name smooth text-4xl sm:text-5xl md:text-6xl font-extrabold"
+                style={{ letterSpacing: "0.03em" }}
+              >
+                {chord.name}
+              </h1>
+            </div>
+            <button
+              className={`my-2 px-6 py-4 w-full max-w-xs font-bold text-xl text-zinc-900 rounded-2xl transition-all duration-200 smooth overflow-hidden relative`}
+              onClick={() => {
+                setFlipped(true);
+                playChord();
+              }}
+              aria-label="Reveal chord"
+              tabIndex={0}
+              type="button"
+              style={{ minHeight: 56, color: "var(--brand-purple)" }}
+            >
+              Reveal
+            </button>
+          </>
         ) : (
           <>
             <div
-              className="rounded-2xl w-full flex justify-center smooth h-[180px]"
+              className="rounded-2xl w-full flex justify-center smooth flex-1"
               style={{ pointerEvents: "none" }}
             >
               <Piano
@@ -187,18 +183,18 @@ export default function ChordCard({ chord, onNext }: Props) {
               />
             </div>
             <button
-              className={`my-2 px-6 py-4 w-full max-w-xs font-bold text-xl text-zinc-900 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 smooth overflow-hidden relative active:scale-95`}
+              className={`my-2 px-6 py-4 w-full max-w-xs font-bold text-xl text-zinc-900 rounded-2xl transition-all duration-200 smooth overflow-hidden relative`}
               onClick={() => {
                 setFlipped(false);
                 setActiveNotes([]); // Clear active notes when moving to next chord
                 onNext();
               }}
-              aria-label="Next Chord"
+              aria-label="Next chord"
               tabIndex={0}
               type="button"
               style={{ minHeight: 56, color: "var(--brand-purple)" }}
             >
-              Next Chord
+              Next
             </button>
           </>
         )}

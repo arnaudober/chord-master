@@ -109,6 +109,5 @@ button {
 }
 
 button:hover {
-    background: var(--brand-purple) !important;
-    color: white !important;
+    color: #ff5858 !important;
 }
