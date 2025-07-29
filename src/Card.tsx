@@ -9,7 +9,28 @@ export default function ChordCard({ chord, onNext }: Props) {
   const [animating, setAnimating] = useState(false);
   const [activeNotes, setActiveNotes] = useState<string[]>([]);
   const [samplerLoaded, setSamplerLoaded] = useState(false);
+  const [audioInitialized, setAudioInitialized] = useState(false);
+  const [needsAudioInit, setNeedsAudioInit] = useState(false);
   const synthRef = useRef<Tone.Sampler | null>(null);
+
+  // Detect if we need audio initialization (iOS Safari)
+  useEffect(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    setNeedsAudioInit(isIOS && isSafari);
+  }, []);
+
+  // Initialize audio context on first user interaction (iOS requirement)
+  const initializeAudio = async () => {
+    if (audioInitialized) return;
+    
+    try {
+      await Tone.start();
+      setAudioInitialized(true);
+    } catch (error) {
+      console.log('Audio initialization failed:', error);
+    }
+  };
 
   // Initialize synth with better sound
   useEffect(() => {
@@ -59,7 +80,10 @@ export default function ChordCard({ chord, onNext }: Props) {
   async function playChord() {
     if (!synthRef.current || !samplerLoaded) return;
     
-    await Tone.start();
+    // Ensure audio is initialized (required for iOS)
+    if (!audioInitialized) {
+      await initializeAudio();
+    }
     
     // Clear any existing active notes
     setActiveNotes([]);
@@ -72,11 +96,6 @@ export default function ChordCard({ chord, onNext }: Props) {
       setTimeout(() => {
         setActiveNotes(prev => [...prev, note]);
       }, delay * 1000);
-      
-      // Remove note from active notes after it finishes playing
-      setTimeout(() => {
-        setActiveNotes(prev => prev.filter(n => n !== note));
-      }, (delay + 1.2) * 1000); // Longer duration for better sustain
       
       synthRef.current!.triggerAttackRelease(note, "1.2", `+${delay}`);
     });
@@ -160,6 +179,19 @@ export default function ChordCard({ chord, onNext }: Props) {
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
+      {/* iOS Audio Initialization Button */}
+      {needsAudioInit && !audioInitialized && (
+        <div className="mb-4 text-center">
+          <button
+            onClick={initializeAudio}
+            className="px-4 py-2 bg-white/60 text-black rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+            aria-label="Enable audio (required on iOS)"
+          >
+            🔊 Enable audio (required on iOS)
+          </button>
+        </div>
+      )}
+      
       <div
         onClick={handleClick}
         className={`glass w-full max-w-[420px] min-w-[220px] min-h-[100px] sm:min-h-[120px] text-center cursor-pointer transition-all duration-300 rounded-2xl flex flex-col items-center justify-center ${
