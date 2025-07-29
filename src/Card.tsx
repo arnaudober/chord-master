@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Props } from "./model";
 import { Piano, MidiNumbers } from "react-piano";
 import "react-piano/dist/styles.css";
@@ -7,16 +7,78 @@ import * as Tone from "tone";
 export default function ChordCard({ chord, onNext }: Props) {
   const [flipped, setFlipped] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [activeNotes, setActiveNotes] = useState<string[]>([]);
+  const [samplerLoaded, setSamplerLoaded] = useState(false);
+  const synthRef = useRef<Tone.Sampler | null>(null);
+
+  // Initialize synth with better sound
+  useEffect(() => {
+    if (!synthRef.current) {
+      // Use Tone.js Sampler with piano samples for realistic sound
+      const piano = new Tone.Sampler({
+        urls: {
+          "C4": "C4.mp3",
+          "D#4": "Ds4.mp3", 
+          "F#4": "Fs4.mp3",
+        },
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+        release: 1.2,
+        attack: 0.01,
+        onload: () => {
+          setSamplerLoaded(true);
+        }
+      }).toDestination();
+
+      // Add subtle reverb for acoustic feel
+      const reverb = new Tone.Reverb({
+        decay: 2,
+        wet: 0.15,
+        preDelay: 0.02
+      });
+
+      piano.connect(reverb);
+      reverb.toDestination();
+
+      synthRef.current = piano;
+    }
+
+    return () => {
+      if (synthRef.current) {
+        synthRef.current.dispose();
+        synthRef.current = null;
+      }
+    };
+  }, []);
+
+  // Clear active notes when chord changes
+  useEffect(() => {
+    setActiveNotes([]);
+  }, [chord]);
 
   // Play chord sound when flipped
   async function playChord() {
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    if (!synthRef.current || !samplerLoaded) return;
+    
     await Tone.start();
     
-    // Play notes one after the other (arpeggio)
+    // Clear any existing active notes
+    setActiveNotes([]);
+    
+    // Play notes one after the other (arpeggio) with visual animation
     chord.keys.forEach((note, index) => {
-      const delay = index * 0.3; // 100ms delay between each note
-      synth.triggerAttackRelease(note, "0.5", `+${delay}`);
+      const delay = index * 0.25; // 250ms delay between each note for better flow
+      
+      // Add note to active notes after delay
+      setTimeout(() => {
+        setActiveNotes(prev => [...prev, note]);
+      }, delay * 1000);
+      
+      // Remove note from active notes after it finishes playing
+      setTimeout(() => {
+        setActiveNotes(prev => prev.filter(n => n !== note));
+      }, (delay + 1.2) * 1000); // Longer duration for better sustain
+      
+      synthRef.current!.triggerAttackRelease(note, "1.2", `+${delay}`);
     });
   }
 
@@ -29,6 +91,7 @@ export default function ChordCard({ chord, onNext }: Props) {
         playChord();
       } else {
         setFlipped(false);
+        setActiveNotes([]); // Clear active notes when flipping back
         onNext();
       }
     }, 180);
@@ -132,7 +195,7 @@ export default function ChordCard({ chord, onNext }: Props) {
                 stopNote={() => {}}
                 renderNoteLabel={({ midiNumber }) => {
                   const noteName = midiNumberToSharpName(midiNumber);
-                  const isActive = chord.keys.includes(noteName);
+                  const isActive = activeNotes.includes(noteName);
                   if (!isActive) return null;
                   const noteLabel = sharpNotes[midiNumber % 12];
                   return (
@@ -147,13 +210,14 @@ export default function ChordCard({ chord, onNext }: Props) {
                     </div>
                   );
                 }}
-                activeNotes={chord.keys.map((key) => MidiNumbers.fromNote(key))}
+                activeNotes={activeNotes.map((key) => MidiNumbers.fromNote(key))}
               />
             </div>
             <button
               className={`my-2 px-6 py-4 w-full max-w-xs font-bold text-xl text-zinc-900 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 smooth overflow-hidden relative active:scale-95`}
               onClick={() => {
                 setFlipped(false);
+                setActiveNotes([]); // Clear active notes when moving to next chord
                 onNext();
               }}
               aria-label="Next Chord"
