@@ -9,77 +9,7 @@ export default function ChordCard({ chord, onNext }: Props) {
   const [animating, setAnimating] = useState(false);
   const [activeNotes, setActiveNotes] = useState<string[]>([]);
   const [samplerLoaded, setSamplerLoaded] = useState(false);
-  const [audioInitialized, setAudioInitialized] = useState(false);
-  const [needsAudioInit, setNeedsAudioInit] = useState(false);
   const synthRef = useRef<Tone.Sampler | null>(null);
-
-  // Detect if we need audio initialization (iOS Safari)
-  useEffect(() => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-    setNeedsAudioInit(isIOS && isSafari);
-  }, []);
-
-  // Initialize audio context on first user interaction (iOS requirement)
-  const initializeAudio = async () => {
-    if (audioInitialized) return;
-    
-    try {
-      // Configure audio session for iOS silent mode compatibility
-      if (Tone.context.state !== 'running') {
-        await Tone.context.resume();
-      }
-      
-      // Set audio session category for iOS to allow playback in silent mode
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (typeof (window as any).webkit !== 'undefined' && (window as any).webkit.messageHandlers) {
-        // iOS WebView - try to set audio session category
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (window as any).webkit.messageHandlers.setAudioSessionCategory?.postMessage('playback');
-        } catch (e) {
-          console.log('Could not set audio session category:', e);
-        }
-      }
-      
-      // For Safari on iOS, we need to set the audio session category
-      if (needsAudioInit) {
-        // Try multiple methods to set audio session category for iOS
-        try {
-          // Method 1: Web Audio API (if available)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const audioContext = Tone.context.rawContext as any;
-          if (audioContext && typeof audioContext.setAudioSessionCategory === 'function') {
-            audioContext.setAudioSessionCategory('playback');
-          }
-          
-          // Method 2: Try to set via document element (for some iOS versions)
-          if (typeof document !== 'undefined') {
-            const audioElement = document.createElement('audio');
-            audioElement.setAttribute('playsinline', 'true');
-            audioElement.setAttribute('webkit-playsinline', 'true');
-            audioElement.setAttribute('preload', 'auto');
-            document.body.appendChild(audioElement);
-            
-            // Try to play and immediately pause to activate audio session
-            audioElement.play().then(() => {
-              audioElement.pause();
-              document.body.removeChild(audioElement);
-            }).catch(() => {
-              document.body.removeChild(audioElement);
-            });
-          }
-        } catch (e) {
-          console.log('Could not set audio session category:', e);
-        }
-      }
-      
-      await Tone.start();
-      setAudioInitialized(true);
-    } catch (error) {
-      console.log('Audio initialization failed:', error);
-    }
-  };
 
   // Initialize synth with better sound
   useEffect(() => {
@@ -129,16 +59,18 @@ export default function ChordCard({ chord, onNext }: Props) {
   async function playChord() {
     if (!synthRef.current || !samplerLoaded) return;
     
-    // Ensure audio is initialized (required for iOS)
-    if (!audioInitialized) {
-      await initializeAudio();
-    }
-    
     // Clear any existing active notes
     setActiveNotes([]);
     
+    // Sort notes by their position on the piano (left to right)
+    const sortedNotes = [...transposedChordNotes].sort((a, b) => {
+      const midiA = MidiNumbers.fromNote(a);
+      const midiB = MidiNumbers.fromNote(b);
+      return midiA - midiB;
+    });
+    
     // Play notes one after the other (arpeggio) with visual animation
-    chord.keys.forEach((note, index) => {
+    sortedNotes.forEach((note, index) => {
       const delay = index * 0.25; // 250ms delay between each note for better flow
       
       // Add note to active notes after delay
@@ -180,67 +112,26 @@ export default function ChordCard({ chord, onNext }: Props) {
     "B",
   ];
 
-  const chordMidiNumbers = chord.keys.map((key) => MidiNumbers.fromNote(key));
-  const minMidi = Math.min(...chordMidiNumbers);
-  const maxMidi = Math.max(...chordMidiNumbers);
+  // Use a fixed range from C to C (one octave) - C4 to C5
+  const first = MidiNumbers.fromNote("C4"); // C4 = 60
+  const last = MidiNumbers.fromNote("C5");  // C5 = 72
 
-  // Calculate a focused range around the chord notes
-  // Add 2 semitones padding on each side for better visual context
-  const padding = 2;
-  let first = minMidi - padding;
-  let last = maxMidi + padding;
-
-  // Ensure we show at least 8 semitones (about 2/3 of an octave) for visual balance
-  const minRange = 8;
-  if (last - first < minRange) {
-    const extra = minRange - (last - first);
-    const extraBefore = Math.floor(extra / 2);
-    const extraAfter = extra - extraBefore;
-    first = Math.max(21, first - extraBefore); // Don't go below A0
-    last = Math.min(108, last + extraAfter);   // Don't go above C8
+  // Transpose chord notes to fit within our C4-C5 range
+  function transposeChordNotes(notes: string[]): string[] {
+    return notes.map(note => {
+      const midiNumber = MidiNumbers.fromNote(note);
+      const noteIndex = midiNumber % 12;
+      // Transpose to octave 4 (C4-C5 range)
+      const transposedMidi = noteIndex + 60; // 60 = C4
+      return MidiNumbers.getAttributes(transposedMidi).note;
+    });
   }
 
-  // Ensure we don't go outside the piano's MIDI range (21-108)
-  first = Math.max(21, first);
-  last = Math.min(108, last);
-
-  // Extend the range to end on a white key to prevent black key overflow
-  // White keys are at positions 0, 2, 4, 5, 7, 9, 11 in the octave (C, D, E, F, G, A, B)
-  const whiteKeyPositions = [0, 2, 4, 5, 7, 9, 11];
-  const lastNoteInOctave = last % 12;
-  
-  // If the last note is a black key, extend to the next white key
-  if (!whiteKeyPositions.includes(lastNoteInOctave)) {
-    const nextWhiteKey = whiteKeyPositions.find(pos => pos > lastNoteInOctave);
-    if (nextWhiteKey !== undefined) {
-      last = last - lastNoteInOctave + nextWhiteKey;
-    } else {
-      // If we're at the end of the octave, go to the next octave's C
-      last = last - lastNoteInOctave + 12;
-    }
-  }
-
-  function midiNumberToSharpName(midiNumber: number) {
-    const noteIndex = midiNumber % 12;
-    const octave = Math.floor(midiNumber / 12) - 1;
-    return `${sharpNotes[noteIndex]}${octave}`;
-  }
+  // Get transposed chord notes for display
+  const transposedChordNotes = transposeChordNotes(chord.keys);
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      {/* iOS Audio Initialization Button */}
-      {needsAudioInit && !audioInitialized && (
-        <div className="mb-4 text-center">
-          <button
-            onClick={initializeAudio}
-            className="px-4 py-2 bg-white/60 text-black rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
-            aria-label="Enable audio (required on iOS)"
-          >
-            🔊 Enable audio (required on iOS)
-          </button>
-        </div>
-      )}
-      
       <div
         onClick={handleClick}
         className={`glass w-full max-w-[420px] min-w-[220px] min-h-[100px] sm:min-h-[120px] text-center cursor-pointer transition-all duration-300 rounded-2xl flex flex-col items-center justify-center ${
@@ -275,7 +166,8 @@ export default function ChordCard({ chord, onNext }: Props) {
                 playNote={() => {}}
                 stopNote={() => {}}
                 renderNoteLabel={({ midiNumber }) => {
-                  const noteName = midiNumberToSharpName(midiNumber);
+                  // Use the same note name format as our transposed notes
+                  const noteName = MidiNumbers.getAttributes(midiNumber).note;
                   const isActive = activeNotes.includes(noteName);
                   if (!isActive) return null;
                   const noteLabel = sharpNotes[midiNumber % 12];
