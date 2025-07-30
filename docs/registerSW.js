@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/jazz-chord-trainer/sw.js', { scope: '/jazz-chord-trainer/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/chord-master/sw.js', { scope: '/chord-master/' })})}

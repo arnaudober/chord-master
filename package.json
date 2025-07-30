@@ -1,5 +1,5 @@
 {
-  "name": "jazz-chord-trainer",
+  "name": "chord-master",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,6 +14,7 @@
     "@fontsource/inter": "^5.2.6",
     "@fontsource/nunito": "^5.2.6",
     "@tailwindcss/vite": "^4.1.11",
+    "lucide-react": "^0.534.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-piano": "^3.1.3",

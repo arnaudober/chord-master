@@ -54,6 +54,10 @@ body {
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     transition: box-shadow 0.3s, background 0.3s;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 4px 16px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Typography hierarchy */
@@ -61,14 +65,70 @@ body {
     font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--glass-bg) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.heading-main::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
+    border-radius: 1px;
+    opacity: 0.7;
 }
 
 .chord-name {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    color: var(--primary-color) !important;
-    letter-spacing: 0.01em;
+    color: rgb(255,255,255,0.9) !important;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 8px rgba(255, 82, 82, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.chord-name::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent, rgba(127, 83, 172, 0.8), transparent, rgba(100, 125, 238, 0.8), transparent);
+    animation: rotate 8s linear infinite;
+    z-index: -1;
+}
+
+.chord-name::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: conic-gradient(from 180deg, transparent, rgba(127, 83, 172, 0.4), transparent, rgba(100, 125, 238, 0.4), transparent);
+    animation: rotate 12s linear infinite reverse;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Smooth transitions for microinteractions */
@@ -77,14 +137,27 @@ body {
 }
 
 .ReactPiano__Key {
-    border: 1px solid rgba(0, 0, 0, 0.5) !important;
-    border-top: none !important;
+    border: none !important;
 }
 
 .ReactPiano__Key--active {
-    background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%) !important;
+    background: #d8d4ed !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Override library defaults for both natural and accidental keys */
+.ReactPiano__Key--active.ReactPiano__Key--natural {
+    background: #d8d4ed !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.ReactPiano__Key--active.ReactPiano__Key--accidental {
+    background: #d8d4ed !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+}
 
 .ReactPiano__Key--natural:last-child {
     border-top-right-radius: 1rem;
@@ -108,6 +181,3 @@ button {
     cursor: pointer !important;
 }
 
-button:hover {
-    color: #ff5858 !important;
-}

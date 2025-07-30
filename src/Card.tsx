@@ -3,6 +3,7 @@ import type { Props } from "./model";
 import { Piano, MidiNumbers } from "react-piano";
 import "react-piano/dist/styles.css";
 import * as Tone from "tone";
+import { RotateCcw } from "lucide-react";
 
 export default function ChordCard({ chord, onNext }: Props) {
   const [flipped, setFlipped] = useState(false);
@@ -154,9 +155,21 @@ export default function ChordCard({ chord, onNext }: Props) {
         ) : (
           <>
             <div
-              className="rounded-2xl w-full flex justify-center smooth flex-1"
+              className="rounded-2xl w-full flex justify-center smooth flex-1 relative"
               style={{ pointerEvents: "none" }}
             >
+              <button
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center transition-all duration-200 z-10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playChord();
+                }}
+                aria-label="Replay chord"
+                type="button"
+                style={{ pointerEvents: "auto" }}
+              >
+                <RotateCcw size={16} color="rgba(0, 0, 0, 0.8)" />
+              </button>
               <Piano
                 noteRange={{ first, last }}
                 playNote={() => {}}
