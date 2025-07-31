@@ -71,6 +71,26 @@ body {
     padding-top: max(env(safe-area-inset-top), 6px);
 }
 
+/* Full height utilities for mobile */
+.h-screen-dynamic {
+    height: 100dvh;
+    min-height: 100dvh;
+    position: relative;
+}
+
+.h-screen-dynamic::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: var(--primary-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 18s ease-in-out infinite;
+    z-index: -1;
+}
+
 /* Typography hierarchy */
 .heading-main {
     font-size: 2.2rem;
