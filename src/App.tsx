@@ -8,7 +8,14 @@ function App() {
   );
 
   const nextChord = () => {
-    const next = Math.floor(Math.random() * chords.length);
+    // Create an array of all possible indices except the current one
+    const availableIndices = Array.from({ length: chords.length }, (_, i) => i)
+      .filter(i => i !== index);
+    
+    // Randomly select from the available indices
+    const randomIndex = Math.floor(Math.random() * availableIndices.length);
+    const next = availableIndices[randomIndex];
+    
     setIndex(next);
   };
 
