@@ -20,7 +20,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center px-4 pt-4 overflow-hidden">
+    <div className="h-screen flex flex-col items-center px-4 overflow-hidden" style={{ paddingTop: 'max(16px, var(--safe-area-top))' }}>
       <header className="w-full flex flex-col items-center flex-shrink-0 mb-5">
         <div className="px-4 py-2 w-full max-w-md rounded-2xl">
           <h1 className="heading-main text-center">

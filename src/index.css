@@ -29,7 +29,6 @@ body,
     color: #222;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding-top: var(--safe-area-top);
     padding-bottom: var(--safe-area-bottom);
     box-sizing: border-box;
     overflow: hidden;
