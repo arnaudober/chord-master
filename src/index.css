@@ -52,6 +52,10 @@ body {
     box-sizing: border-box;
 }
 
+.safe-area-top {
+    margin-top: max(16px, var(--safe-area-top));
+}
+
 /* Glassmorphism utility */
 .glass {
     background: var(--glass-bg);
