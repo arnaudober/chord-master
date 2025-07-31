@@ -21,15 +21,15 @@
 html,
 body,
 #root {
-    height: 100dvh;
+    height: 100vh;
     font-family: var(--font-sans);
     background: var(--primary-gradient);
     background-size: 400% 400%;
+    background-attachment: fixed;
     animation: gradientBG 18s ease-in-out infinite;
     color: #222;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding-bottom: var(--safe-area-bottom);
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -52,9 +52,7 @@ body {
     box-sizing: border-box;
 }
 
-.safe-area-top {
-    margin-top: max(16px, var(--safe-area-top));
-}
+
 
 /* Glassmorphism utility */
 .glass {
