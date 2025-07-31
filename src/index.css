@@ -59,6 +59,16 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+/* Safe area utilities */
+.pt-safe {
+    padding-top: max(env(safe-area-inset-top), 8px);
+}
+
+/* Alternative: more precise dynamic island handling */
+.pt-dynamic-island {
+    padding-top: max(env(safe-area-inset-top), 6px);
+}
+
 /* Typography hierarchy */
 .heading-main {
     font-size: 2.2rem;
