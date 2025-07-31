@@ -18,9 +18,11 @@ html,
 body,
 #root {
     height: 100dvh;
+    min-height: 100dvh;
     font-family: var(--font-sans);
     background: var(--primary-gradient);
     background-size: 400% 400%;
+    background-attachment: fixed;
     animation: gradientBG 18s ease-in-out infinite;
     color: #222;
     -webkit-font-smoothing: antialiased;
