@@ -84,7 +84,7 @@ body {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 100vh;
     background: var(--primary-gradient);
     background-size: 400% 400%;
     animation: gradientBG 18s ease-in-out infinite;
